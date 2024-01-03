@@ -1,0 +1,12 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eno0:
+      addresses: [192.168.1.2/24]
+      routes:
+        - to: default
+          via: 10.10.10.1
+      nameservers:
+        search: [local]
+        addresses: [127.0.0.1, 8.8.8.8, 1.1.1.1]

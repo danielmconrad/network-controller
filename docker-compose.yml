@@ -1,0 +1,61 @@
+version: "3.7"
+
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    cap_add:
+      - NET_ADMIN
+    dns: [127.0.0.1, 1.1.1.1]
+    environment:
+      - DNSMASQ_LISTENING=all
+      - ServerIP=192.168.1.2
+      - TZ=America/Chicago
+      - WEBPASSWORD=pihole
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - pihole_volume:/etc
+
+  unifi-db:
+    image: mongo:3
+    container_name: unifi-db
+    environment:
+      - MONGO_INITDB_DATABASE=unifi
+    volumes:
+      - unifi_db_volume:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    restart: unless-stopped
+
+  unifi-web:
+    image: lscr.io/linuxserver/unifi-network-application:latest
+    container_name: unifi-web
+    environment:
+      - MEM_LIMIT=512
+      - MEM_STARTUP=512
+      - MONGO_DBNAME=unifi
+      - MONGO_HOST=unifi-db
+      - MONGO_PASS=unifi_pass
+      - MONGO_PORT=27017
+      - MONGO_USER=unifi_user
+      - PGID=1000
+      - PUID=1000
+      - TZ=America/Chicago
+    ports:
+      - 8443:8443
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080
+      - 1900:1900/udp
+      - 8843:8843
+      - 8880:8880
+      - 6789:6789
+      - 5514:5514/udp
+    volumes:
+      - unifi_web_volume:/config
+    restart: unless-stopped
+
+volumes:
+  pihole_volume: {}
+  unifi_db_volume: {}
+  unifi_web_volume: {}
