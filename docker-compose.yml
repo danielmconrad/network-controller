@@ -15,7 +15,7 @@ services:
     network_mode: host
     restart: unless-stopped
     volumes:
-      - pihole_volume:/etc
+      - ./data/pihole/etc:/etc
 
   unifi-db:
     image: mongo:3
@@ -23,7 +23,7 @@ services:
     environment:
       - MONGO_INITDB_DATABASE=unifi
     volumes:
-      - unifi_db_volume:/data/db
+      - ./data/unifi-db/data/db:/data/db
       - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     restart: unless-stopped
 
@@ -52,10 +52,5 @@ services:
       - 6789:6789
       - 5514:5514/udp
     volumes:
-      - unifi_web_volume:/config
+      - ./data/unifi-web/config:/config
     restart: unless-stopped
-
-volumes:
-  pihole_volume: {}
-  unifi_db_volume: {}
-  unifi_web_volume: {}
